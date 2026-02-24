@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml.Serialization;
-using SoulsFormats;
+using System.Numerics;
 
 namespace SoulsFormats
 {
@@ -79,7 +78,7 @@ namespace SoulsFormats
             /// </summary>
             public List<Event.RetryPoint> RetryPoints { get; set; }
 
-            /// <summary>
+/// <summary>
             /// Unknown.
             /// </summary>
             public List<Event.AreaTeam> AreaTeams { get; set; }
@@ -216,18 +215,14 @@ namespace SoulsFormats
             /// </summary>
             [MSBReference(ReferenceType = typeof(Part))]
             public string PartName { get; set; }
-            [IndexProperty]
-            [XmlIgnore]
-            private int PartIndex { get; set; }
+            private int PartIndex;
 
             /// <summary>
             /// Unknown.
             /// </summary>
             [MSBReference(ReferenceType = typeof(Region))]
             public string RegionName { get; set; }
-            [IndexProperty]
-            [XmlIgnore]
-            private int RegionIndex { get; set; }
+            private int RegionIndex;
 
             /// <summary>
             /// Identifies the Event in event scripts.
@@ -405,8 +400,8 @@ namespace SoulsFormats
 
             internal virtual void GetIndices(MSBE msb, Entries entries)
             {
-                PartIndex = MSB.FindIndex(this, entries.Parts, PartName);
-                RegionIndex = MSB.FindIndex(this, entries.Regions, RegionName);
+                PartIndex = MSB.FindIndex(entries.Parts, PartName);
+                RegionIndex = MSB.FindIndex(entries.Regions, RegionName);
             }
 
             /// <summary>
@@ -430,9 +425,7 @@ namespace SoulsFormats
                 /// </summary>
                 [MSBReference(ReferenceType = typeof(Part))]
                 public string TreasurePartName { get; set; }
-                [IndexProperty]
-                [XmlIgnore]
-                private int TreasurePartIndex { get; set; }
+                private int TreasurePartIndex;
 
                 /// <summary>
                 /// The item lot to be given.
@@ -518,7 +511,7 @@ namespace SoulsFormats
                 internal override void GetIndices(MSBE msb, Entries entries)
                 {
                     base.GetIndices(msb, entries);
-                    TreasurePartIndex = MSB.FindIndex(this, entries.Parts, TreasurePartName);
+                    TreasurePartIndex = MSB.FindIndex(entries.Parts, TreasurePartName);
                 }
             }
 
@@ -584,21 +577,15 @@ namespace SoulsFormats
                 /// Regions where parts will spawn from.
                 /// </summary>
                 [MSBReference(ReferenceType = typeof(Region))]
-                public string[] SpawnRegionNames { get; set; }
-
-                [IndexProperty]
-                [XmlIgnore]
-                private int[] SpawnRegionIndices { get; set; }
+                public string[] SpawnRegionNames { get; private set; }
+                private int[] SpawnRegionIndices;
 
                 /// <summary>
                 /// Parts that will be respawned.
                 /// </summary>
                 [MSBReference(ReferenceType = typeof(Part))]
-                public string[] SpawnPartNames { get; set; }
-
-                [IndexProperty]
-                [XmlIgnore]
-                private int[] SpawnPartIndices { get; set; }
+                public string[] SpawnPartNames { get; private set; }
+                private int[] SpawnPartIndices;
 
                 /// <summary>
                 /// Creates a Generator with default values.
@@ -672,8 +659,8 @@ namespace SoulsFormats
                 internal override void GetIndices(MSBE msb, Entries entries)
                 {
                     base.GetIndices(msb, entries);
-                    SpawnRegionIndices = MSB.FindIndices(this, entries.Regions, SpawnRegionNames);
-                    SpawnPartIndices = MSB.FindIndices(this, entries.Parts, SpawnPartNames);
+                    SpawnRegionIndices = MSB.FindIndices(entries.Regions, SpawnRegionNames);
+                    SpawnPartIndices = MSB.FindIndices(entries.Parts, SpawnPartNames);
                 }
             }
 
@@ -696,9 +683,7 @@ namespace SoulsFormats
                 /// </summary>
                 [MSBReference(ReferenceType = typeof(Part))]
                 public string ObjActPartName { get; set; }
-                [IndexProperty]
-                [XmlIgnore]
-                private int ObjActPartIndex { get; set; }
+                private int ObjActPartIndex;
 
                 /// <summary>
                 /// A row in ObjActParam.
@@ -765,7 +750,7 @@ namespace SoulsFormats
                 internal override void GetIndices(MSBE msb, Entries entries)
                 {
                     base.GetIndices(msb, entries);
-                    ObjActPartIndex = MSB.FindIndex(this, entries.Parts, ObjActPartName);
+                    ObjActPartIndex = MSB.FindIndex(entries.Parts, ObjActPartName);
                 }
             }
 
@@ -782,9 +767,7 @@ namespace SoulsFormats
                 /// </summary>
                 [MSBReference(ReferenceType = typeof(Region))]
                 public string NavmeshRegionName { get; set; }
-                [IndexProperty]
-                [XmlIgnore]
-                private int NavmeshRegionIndex { get; set; }
+                private int NavmeshRegionIndex;
 
                 /// <summary>
                 /// Creates a Navmesh with default values.
@@ -818,7 +801,7 @@ namespace SoulsFormats
                 internal override void GetIndices(MSBE msb, Entries entries)
                 {
                     base.GetIndices(msb, entries);
-                    NavmeshRegionIndex = MSB.FindIndex(this, entries.Regions, NavmeshRegionName);
+                    NavmeshRegionIndex = MSB.FindIndex(entries.Regions, NavmeshRegionName);
                 }
             }
 
@@ -935,11 +918,8 @@ namespace SoulsFormats
                 /// Unknown.
                 /// </summary>
                 [MSBReference(ReferenceType = typeof(Part))]
-                public string[] GroupPartsNames { get; set; }
-
-                [IndexProperty]
-                [XmlIgnore]
-                private int[] GroupPartsIndices { get; set; }
+                public string[] GroupPartsNames { get; private set; }
+                private int[] GroupPartsIndices;
 
                 /// <summary>
                 /// Creates a PlatoonInfo with default values.
@@ -984,7 +964,7 @@ namespace SoulsFormats
                 internal override void GetIndices(MSBE msb, Entries entries)
                 {
                     base.GetIndices(msb, entries);
-                    GroupPartsIndices = MSB.FindIndices(this, entries.Parts, GroupPartsNames);
+                    GroupPartsIndices = MSB.FindIndices(entries.Parts, GroupPartsNames);
                 }
             }
 
@@ -999,25 +979,20 @@ namespace SoulsFormats
                 /// <summary>
                 /// Determines patrol behavior. 0 = return to first region on loop, 1 = go through list backwards on loop, etc.
                 /// </summary>
-                [MSBEnum(EnumType = "PATROL_TYPE")]
                 public byte PatrolType { get; set; }
 
                 /// <summary>
                 /// Unknown.
                 /// </summary>
                 [MSBReference(ReferenceType = typeof(Region))]
-                public string[] WalkRegionNames { get; set; }
-
-                [IndexProperty]
-                [XmlIgnore]
-                private short[] WalkRegionIndices { get; set; }
+                public string[] WalkRegionNames { get; private set; }
+                private short[] WalkRegionIndices;
 
                 /// <summary>
                 /// Creates a PatrolInfo with default values.
                 /// </summary>
                 public PatrolInfo() : base($"{nameof(Event)}: {nameof(PatrolInfo)}")
                 {
-                    WalkRegionIndices = new short[64];
                     WalkRegionNames = new string[64];
                 }
 
@@ -1066,7 +1041,7 @@ namespace SoulsFormats
                     base.GetIndices(msb, entries);
                     WalkRegionIndices = new short[WalkRegionNames.Length];
                     for (int i = 0; i < WalkRegionNames.Length; i++)
-                        WalkRegionIndices[i] = (short)MSB.FindIndex(this, entries.Regions, WalkRegionNames[i]);
+                        WalkRegionIndices[i] = (short)MSB.FindIndex(entries.Regions, WalkRegionNames[i]);
                 }
             }
 
@@ -1083,20 +1058,14 @@ namespace SoulsFormats
                 /// </summary>
                 [MSBReference(ReferenceType = typeof(Part))]
                 public string RiderPartName { get; set; }
-
-                [IndexProperty]
-                [XmlIgnore]
-                private int RiderPartIndex { get; set; }
+                private int RiderPartIndex;
 
                 /// <summary>
                 /// Unknown.
                 /// </summary>
                 [MSBReference(ReferenceType = typeof(Part))]
                 public string MountPartName { get; set; }
-
-                [IndexProperty]
-                [XmlIgnore]
-                private int MountPartIndex { get; set; }
+                private int MountPartIndex;
 
                 /// <summary>
                 /// Creates a Mount with default values.
@@ -1131,8 +1100,8 @@ namespace SoulsFormats
                 internal override void GetIndices(MSBE msb, Entries entries)
                 {
                     base.GetIndices(msb, entries);
-                    RiderPartIndex = MSB.FindIndex(this, entries.Parts, RiderPartName);
-                    MountPartIndex = MSB.FindIndex(this, entries.Parts, MountPartName);
+                    RiderPartIndex = MSB.FindIndex(entries.Parts, RiderPartName);
+                    MountPartIndex = MSB.FindIndex(entries.Parts, MountPartName);
                 }
             }
 
@@ -1149,16 +1118,12 @@ namespace SoulsFormats
                 /// </summary>
                 [MSBReference(ReferenceType = typeof(Part))]
                 public string SignPartName { get; set; }
-
-                [IndexProperty]
-                [XmlIgnore]
-                private int SignPartIndex { get; set; }
+                private int SignPartIndex;
 
                 /// <summary>
                 /// Unknown.
                 /// </summary>
-                [MSBParamReference(ParamName = "SignPuddleParam")]
-                public int SignPuddleParamID { get; set; }
+                public int UnkT04 { get; set; }
 
                 /// <summary>
                 /// Creates a SignPool with default values.
@@ -1173,7 +1138,7 @@ namespace SoulsFormats
                 private protected override void ReadTypeData(BinaryReaderEx br)
                 {
                     SignPartIndex = br.ReadInt32();
-                    SignPuddleParamID = br.ReadInt32();
+                    UnkT04 = br.ReadInt32();
                     br.AssertInt32(0);
                     br.AssertInt32(0);
                 }
@@ -1181,7 +1146,7 @@ namespace SoulsFormats
                 private protected override void WriteTypeData(BinaryWriterEx bw)
                 {
                     bw.WriteInt32(SignPartIndex);
-                    bw.WriteInt32(SignPuddleParamID);
+                    bw.WriteInt32(UnkT04);
                     bw.WriteInt32(0);
                     bw.WriteInt32(0);
                 }
@@ -1195,9 +1160,82 @@ namespace SoulsFormats
                 internal override void GetIndices(MSBE msb, Entries entries)
                 {
                     base.GetIndices(msb, entries);
-                    SignPartIndex = MSB.FindIndex(this, entries.Parts, SignPartName);
+                    SignPartIndex = MSB.FindIndex(entries.Parts, SignPartName);
                 }
             }
+
+            /// <summary>
+            /// Unknown.
+            /// </summary>
+            public class RetryPoint : Event
+            {
+                private protected override EventType Type => EventType.RetryPoint;
+                private protected override bool HasTypeData => true;
+
+                /// <summary>
+                /// Unknown.
+                /// </summary>
+                [MSBReference(ReferenceType = typeof(Part))]
+                public string RetryPartName { get; set; }
+                private int RetryPartIndex;
+
+                /// <summary>
+                /// Flag that must be set for stake to be available.
+                /// </summary>
+                public uint EventFlagID { get; set; }
+
+                /// <summary>
+                /// Unknown.
+                /// </summary>
+                public float UnkT08 { get; set; }
+
+                /// <summary>
+                /// Unknown.
+                /// </summary>
+                [MSBReference(ReferenceType = typeof(Region))]
+                public string RetryRegionName { get; set; }
+                private short RetryRegionIndex;
+
+                /// <summary>
+                /// Creates a SignPool with default values.
+                /// </summary>
+                public RetryPoint() : base($"{nameof(Event)}: {nameof(RetryPoint)}") { }
+
+                internal RetryPoint(BinaryReaderEx br) : base(br) { }
+
+                private protected override void ReadTypeData(BinaryReaderEx br)
+                {
+                    RetryPartIndex = br.ReadInt32();
+                    EventFlagID = br.ReadUInt32();
+                    UnkT08 = br.ReadSingle();
+                    RetryRegionIndex = br.ReadInt16();
+                    br.AssertInt16(0);
+                }
+
+                private protected override void WriteTypeData(BinaryWriterEx bw)
+                {
+                    bw.WriteInt32(RetryPartIndex);
+                    bw.WriteUInt32(EventFlagID);
+                    bw.WriteSingle(UnkT08);
+                    bw.WriteInt16(RetryRegionIndex);
+                    bw.WriteInt16(0);
+                }
+
+                internal override void GetNames(MSBE msb, Entries entries)
+                {
+                    base.GetNames(msb, entries);
+                    RetryPartName = MSB.FindName(entries.Parts, RetryPartIndex);
+                    RetryRegionName = MSB.FindName(entries.Regions, RetryRegionIndex);
+                }
+
+                internal override void GetIndices(MSBE msb, Entries entries)
+                {
+                    base.GetIndices(msb, entries);
+                    RetryPartIndex = MSB.FindIndex(entries.Parts, RetryPartName);
+                    RetryRegionIndex = (short)MSB.FindIndex(entries.Regions, RetryRegionName);
+                }
+            }
+
 
             /// <summary>
             /// Unknown.
@@ -1256,84 +1294,6 @@ namespace SoulsFormats
                     bw.WriteInt32(EUnk20);
                     bw.WriteInt32(EUnk24);
                     bw.WriteInt32(EUnk28);
-                }
-            }
-
-            /// <summary>
-            /// Unknown.
-            /// </summary>
-            public class RetryPoint : Event
-            {
-                private protected override EventType Type => EventType.RetryPoint;
-                private protected override bool HasTypeData => true;
-
-                /// <summary>
-                /// The asset name that the stake is represented by.
-                /// </summary>
-                [MSBReference(ReferenceType = typeof(Part))]
-                public string RetryPartName { get; set; }
-
-                [IndexProperty]
-                [XmlIgnore]
-                private int RetryPartIndex { get; set; }
-
-                /// <summary>
-                /// Flag that must be set for stake to be available.
-                /// </summary>
-                public uint TriggerEventFlagID { get; set; }
-
-                /// <summary>
-                /// The distance at which the retry point is active (only used if no retry region is set).
-                /// </summary>
-                public float RetryDistance { get; set; }
-
-                /// <summary>
-                /// The region in which the retry point is active.
-                /// </summary>
-                [MSBReference(ReferenceType = typeof(Region))]
-                public string RetryRegionName { get; set; }
-
-                [IndexProperty]
-                [XmlIgnore]
-                private short RetryRegionIndex { get; set; }
-
-                /// <summary>
-                /// Creates a RetryPoint with default values.
-                /// </summary>
-                public RetryPoint() : base($"{nameof(Event)}: {nameof(RetryPoint)}") { }
-
-                internal RetryPoint(BinaryReaderEx br) : base(br) { }
-
-                private protected override void ReadTypeData(BinaryReaderEx br)
-                {
-                    RetryPartIndex = br.ReadInt32();
-                    TriggerEventFlagID = br.ReadUInt32();
-                    RetryDistance = br.ReadSingle();
-                    RetryRegionIndex = br.ReadInt16();
-                    br.AssertInt16(0);
-                }
-
-                private protected override void WriteTypeData(BinaryWriterEx bw)
-                {
-                    bw.WriteInt32(RetryPartIndex);
-                    bw.WriteUInt32(TriggerEventFlagID);
-                    bw.WriteSingle(RetryDistance);
-                    bw.WriteInt16(RetryRegionIndex);
-                    bw.WriteInt16(0);
-                }
-
-                internal override void GetNames(MSBE msb, Entries entries)
-                {
-                    base.GetNames(msb, entries);
-                    RetryPartName = MSB.FindName(entries.Parts, RetryPartIndex);
-                    RetryRegionName = MSB.FindName(entries.Regions, RetryRegionIndex);
-                }
-
-                internal override void GetIndices(MSBE msb, Entries entries)
-                {
-                    base.GetIndices(msb, entries);
-                    RetryPartIndex = MSB.FindIndex(this, entries.Parts, RetryPartName);
-                    RetryRegionIndex = (short)MSB.FindIndex(this, entries.Regions, RetryRegionName);
                 }
             }
 

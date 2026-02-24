@@ -95,7 +95,16 @@ namespace SoulsFormats
                 br.AssertInt32(0);
                 long paramTypeOffset = br.ReadInt64();
                 br.AssertPattern(0x14, 0x00);
-                ParamType = br.GetASCII(paramTypeOffset);
+                br.StepIn(paramTypeOffset);
+                try
+                {
+                    ParamType = br.ReadASCII();
+                }
+                catch
+                {
+                    // AC6 case
+                }
+                br.StepOut();
                 actualStringsOffset = paramTypeOffset;
             }
             else

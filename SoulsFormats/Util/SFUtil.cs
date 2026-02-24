@@ -476,6 +476,7 @@ namespace SoulsFormats
             DarkSouls3 = 0,
             EldenRing = 1,
             ArmoredCore6 = 2,
+            Nightreign = 3,
         }
 
             private static readonly Dictionary<RegulationKey, byte[]> RegulationKeyDictionary = new Dictionary<RegulationKey, byte[]>
@@ -484,7 +485,9 @@ namespace SoulsFormats
                 { RegulationKey.EldenRing, ParseHexString(
                     "99 BF FC 36 6A 6B C8 C6 F5 82 7D 09 36 02 D6 76 C4 28 92 A0 1C 20 7F B0 24 D3 AF 4E 49 3F EF 99")},
                 { RegulationKey.ArmoredCore6, ParseHexString(
-                    "10 CE ED 47 7B 7C D9 D7 E6 93 8E 11 47 13 E7 87 D5 39 13 B1 D 31 8E C1 35 E4 BE 50 50 4E E 10")}
+                    "10 CE ED 47 7B 7C D9 D7 E6 93 8E 11 47 13 E7 87 D5 39 13 B1 D 31 8E C1 35 E4 BE 50 50 4E E 10")},
+                { RegulationKey.Nightreign,
+                    new byte[] { 0x9A, 0x8E, 0xE9, 0x0C, 0x4C, 0x01, 0xA4, 0x31, 0x68, 0xA1, 0x7D, 0x9D, 0x75, 0xE4, 0xA7, 0xD0, 0x21, 0x07, 0xEB, 0xCF, 0x43, 0xD5, 0xAC, 0xB0, 0x55, 0x4F, 0x94, 0x16, 0x01, 0xB5, 0x79, 0x18 }},
             };
 
         /// <summary>
@@ -507,6 +510,11 @@ namespace SoulsFormats
         public static BND4 DecryptAC6Regulation(string path)
         {
             return DecryptBndWithKey(path, RegulationKey.ArmoredCore6);
+        }
+
+        public static BND4 DecryptNRRegulation(string path)
+        {
+            return DecryptBndWithKey(path, RegulationKey.Nightreign);
         }
 
         /// <summary>
@@ -533,6 +541,11 @@ namespace SoulsFormats
         public static void EncryptERRegulation(string path, BND4 bnd)
         {
             EncryptRegulationWithKey(path, bnd, RegulationKey.EldenRing);
+        }
+
+        public static void EncryptNRRegulation(string path, BND4 bnd)
+        {
+            EncryptRegulationWithKey(path, bnd, RegulationKey.Nightreign);
         }
 
         /// <summary>

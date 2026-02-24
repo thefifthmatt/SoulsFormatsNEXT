@@ -13,6 +13,8 @@ namespace SoulsFormats
         /// </summary>
         public bool LongFormat { get; set; }
 
+        public int Version { get; set; }
+
         /// <summary>
         /// Descriptions of built-in functions which can be used in the ESD file.
         /// </summary>
@@ -62,8 +64,8 @@ namespace SoulsFormats
             br.VarintLong = LongFormat;
 
             br.AssertInt32(1);
-            br.AssertInt32(1);
-            br.AssertInt32(1);
+            Version = br.AssertInt32(1, 2);
+            br.AssertInt32(Version);
             br.AssertInt32(0x7C);
             int dataSize = br.ReadInt32();
             br.AssertInt32(11);
@@ -178,7 +180,7 @@ namespace SoulsFormats
             Machines = new List<MachineDesc>();
             for (int i = 0; i < machineCount; i++)
             {
-                Machines.Add(new MachineDesc(br, strings, states, stateSize));
+                Machines.Add(new MachineDesc(br, strings, states, stateSize, dataStart, Version));
             }
 
             if (conditions.Count > 0 || commands.Count > 0 || passCommands.Count > 0 || states.Count > 0)
@@ -408,7 +410,7 @@ namespace SoulsFormats
             {
                 ID = br.ReadVarint();
                 long nameIndexOffset = br.ReadVarint();
-                br.AssertVarint(1);
+                br.AssertVarint(nameIndexOffset == -1 ? 0 : 1);
                 long entryCommandOffset = br.ReadVarint();
                 long entryCommandCount = br.ReadVarint();
                 long exitCommandOffset = br.ReadVarint();
@@ -419,11 +421,15 @@ namespace SoulsFormats
                 long passCommandCount = br.ReadVarint();
                 long conditionOffset = br.ReadVarint();
                 long conditionCount = br.ReadVarint();
-                br.AssertVarint(-1);
-                br.AssertVarint(0);
+                // What is this?
+                br.AssertVarint(-1, 0);
+                br.AssertVarint(0, -1);
 
-                short nameIndex = br.GetInt16(dataStart + nameIndexOffset);
-                Name = strings[nameIndex];
+                if (nameIndexOffset >= 0)
+                {
+                    short nameIndex = br.GetInt16(dataStart + nameIndexOffset);
+                    Name = strings[nameIndex];
+                }
                 EntryCommands = GetUniqueOffsetList(entryCommandOffset, entryCommandCount, commands, commandSize);
                 ExitCommands = GetUniqueOffsetList(exitCommandOffset, exitCommandCount, commands, commandSize);
                 WhileCommands = GetUniqueOffsetList(whileCommandOffset, whileCommandCount, commands, commandSize);
@@ -473,12 +479,28 @@ namespace SoulsFormats
                 States = new List<StateDesc>();
             }
 
-            internal MachineDesc(BinaryReaderEx br, List<string> strings, Dictionary<long, StateDesc> states, int stateSize)
+            internal MachineDesc(BinaryReaderEx br, List<string> strings, Dictionary<long, StateDesc> states, int stateSize, long dataStart, int version)
             {
                 ID = br.ReadInt32();
                 short nameIndex = br.ReadInt16();
                 Unk06 = br.ReadInt16();
-                short[] paramIndices = br.ReadInt16s(8);
+                int paramCount;
+                short[] paramIndices = null;
+                long paramIndicesOffset = 0;
+                if (version == 1)
+                {
+                    paramCount = 8;
+                    paramIndices = br.ReadInt16s(8);
+                }
+                else
+                {
+                    paramIndicesOffset = br.ReadVarint();
+                    paramCount = br.ReadInt32();
+                    if (br.VarintLong)
+                    {
+                        br.AssertInt32(0);
+                    }
+                }
                 br.AssertVarint(-1);
                 br.AssertVarint(0);
                 br.AssertVarint(-1);
@@ -486,12 +508,17 @@ namespace SoulsFormats
                 long stateOffset = br.ReadVarint();
                 long stateCount = br.ReadVarint();
                 States = GetUniqueOffsetList(stateOffset, stateCount, states, stateSize);
+                if (version > 1 && paramCount > 0)
+                {
+                    paramIndices = br.GetInt16s(dataStart + paramIndicesOffset, paramCount);
+                }
 
                 Name = strings[nameIndex];
-                ParamNames = new string[8];
-                for (int i = 0; i < 8; i++)
+                ParamNames = new string[paramCount];
+                for (int i = 0; i < paramCount; i++)
                 {
-                    if (paramIndices[i] >= 0)
+                    // Unfortunately this is messed up. It worked in DS2 (?)
+                    if (paramIndices[i] != -1) // >= 0 && paramIndices[i] < strings.Count)
                     {
                         ParamNames[i] = strings[paramIndices[i]];
                     }
