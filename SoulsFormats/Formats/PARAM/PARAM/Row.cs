@@ -47,6 +47,23 @@ namespace SoulsFormats
                 Cells = cells;
             }
 
+            /// <summary>
+            /// Copy constructor for a row. Does not add to the param.
+            /// </summary>
+            /// <param name="clone">The row that is being copied.</param>
+            public Row(Row clone)
+            {
+                ID = clone.ID;
+                Name = clone.Name;
+                var cells = new Cell[clone.Cells.Count];
+                for (int i = 0; i < clone.Cells.Count; i++)
+                {
+                    Cell cell = clone.Cells[i];
+                    cells[i] = new Cell(cell.Def, cell.Value);
+                }
+                Cells = cells;
+            }
+
             internal Row(BinaryReaderEx br, PARAM parent, ref long actualStringsOffset)
             {
                 long nameOffset;
@@ -327,7 +344,7 @@ namespace SoulsFormats
             /// <summary>
             /// Returns the first cell in the row with the given internal name.
             /// </summary>
-            public Cell this[string name] => Cells.First(cell => cell.Def.InternalName == name);
+            public Cell this[string name] => Cells.FirstOrDefault(cell => cell.Def.InternalName == name);
         }
     }
 }

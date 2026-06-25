@@ -143,7 +143,9 @@ namespace SoulsFormats
                         (field.RemovedRegulationVersion == 0 || field.RemovedRegulationVersion > ifield.FirstRegulationVersion)
                         && (ifield.RemovedRegulationVersion == 0 || field.FirstRegulationVersion < ifield.RemovedRegulationVersion)));
                 Field field2 = def.Fields.Find(matchingFieldTest);
-                if (field2 != null)
+                // Tolerate repeated field names from dsms-authored defs (e.g. COOL_TIME_PARAM_ST.limitationTime);
+                // only treat as an error when version-aware, where an overlapping repeat is a genuine conflict.
+                if (field2 != null && versionAware)
                     throw new Exception("Repeated field name found in paramdef: " + def.ParamType + ", name: " + field.InternalName);
                 
                 return field;
